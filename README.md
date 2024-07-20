@@ -6,8 +6,7 @@ Duration:july10 to AUGEST25 2024
 Mentor:Neela Santhosh kumar
 
 
-## overview of the project
-
+## overview of the project""C:\Users\gugul\OneDrive\Pictures\Screenshots\Screenshot 2024-07-19 231330.png"
 ## Project: Machine Learning
 
 # OBJECTIVE
