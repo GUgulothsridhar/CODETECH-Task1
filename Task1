@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-to-Speech Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        textarea {
+            width: 80%;
+            height: 150px;
+            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        select {
+            font-size: 16px;
+            padding: 5px;
+        }
+        label {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        audio {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text-to-Speech Converter</h1>
+    <label for="textInput">Enter text to convert:</label><br>
+    <textarea id="textInput" placeholder="Enter text here..."></textarea><br>
+    
+    <label for="language">Select Language:</label>
+    <select id="language">
+        <option value="en-US">English (US)</option>
+        <option value="es-ES">Spanish</option>
+        <option value="fr-FR">French</option>
+        <option value="de-DE">German</option>
+    </select><br><br>
+
+    <label for="voice">Select Voice:</label>
+    <select id="voice"></select><br><br>
+
+    <label for="pitch">Pitch:</label>
+    <input type="range" id="pitch" min="0" max="2" step="0.1" value="1"><br><br>
+
+    <label for="rate">Rate:</label>
+    <input type="range" id="rate" min="0.1" max="10" step="0.1" value="1"><br><br>
+
+    <button onclick="convertTextToSpeech()">Convert to Speech</button><br><br>
+
+    <audio controls id="audioPlayer" style="display: none;">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        const synth = window.speechSynthesis;
+
+        // Populate voice options
+        function populateVoiceList() {
+            const voices = synth.getVoices();
+
+            for (let i = 0; i < voices.length; i++) {
+                const option = document.createElement('option');
+                option.textContent = ${voices[i].name} (${voices[i].lang});
+                option.setAttribute('data-lang', voices[i].lang);
+                option.setAttribute('data-name', voices[i].name);
+                document.getElementById('voice').appendChild(option);
+            }
+        }
+
+        populateVoiceList();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoiceList;
+        }
+
+        // Function to convert text to speech
+        function convertTextToSpeech() {
+            const text = document.getElementById('textInput').value;
+            const language = document.getElementById('language').value;
+            const selectedVoice = document.getElementById('voice').value;
+            const pitch = document.getElementById('pitch').value;
+            const rate = document.getElementById('rate').value;
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = language;
+            utterance.pitch = parseFloat(pitch);
+            utterance.rate = parseFloat(rate);
+
+            // Find the selected voice
+            const voices = synth.getVoices();
+            for (let i = 0; i < voices.length; i++) {
+                if (voices[i].name === selectedVoice) {
+                    utterance.voice = voices[i];
+                    break;
+                }
+            }
+
+            synth.speak(utterance);
+
+            utterance.onend = function() {
+                document.getElementById('audioPlayer').style.display = 'block';
+                const blob = new Blob([new XMLSerializer().serializeToString(utterance)]);
+                const url = URL.createObjectURL(blob);
+                const audioPlayer = document.getElementById('audioPlayer');
+                audioPlayer.src = url;
+            };
+        }
+    </script>
+</body>
+</html>
